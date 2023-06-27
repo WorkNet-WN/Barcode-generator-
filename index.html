@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Barcode Generator</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+    }
+
+    .container {
+      max-width: 500px;
+      margin: 0 auto;
+      padding: 20px;
+      background-color: #f7f7f7;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+    }
+
+    label {
+      display: block;
+      margin-bottom: 10px;
+    }
+
+    input[type="text"],
+    input[type="date"],
+    select {
+      width: 100%;
+      padding: 8px;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+    }
+
+    button {
+      display: block;
+      margin-top: 20px;
+      padding: 10px 20px;
+      background-color: #4caf50;
+      color: #fff;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+
+    #barcodeContainer {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: flex-start;
+      margin-top: 20px;
+    }
+
+    .barcode-svg {
+      margin-right: 10px;
+    }
+  </style>
+  <script src="https://cdn.jsdelivr.net/npm/jsbarcode@3.11.0/dist/JsBarcode.all.min.js"></script>
+  <script src="https://cdn.rawgit.com/davidshimjs/qrcodejs/gh-pages/qrcode.min.js"></script>
+</head>
+<body>
+  <div class="container">
+    <h1>Barcode Generator</h1>
+    <form id="barcodeForm">
+      <label for="name">Name:</label>
+      <input type="text" id="name" required>
+      
+      <label for="dob">Date of Birth:</label>
+      <input type="date" id="dob" required>
+      
+      <label for="format">Barcode Format:</label>
+      <select id="format">
+        <option value="CODE128">CODE128</option>
+        <option value="QRCode">QR Code</option>
+      </select>
+      
+      <label for="customText">Custom Text:</label>
+      <input type="text" id="customText">
+      
+      <button type="submit">Generate Barcode</button>
+    </form>
+
+    <div id="barcodeContainer"></div>
+  </div>
+
+  <script>
+    // Get the form and barcode container elements
+    const form = document.getElementById('barcodeForm');
+    const barcodeContainer = document.getElementById('barcodeContainer');
+
+    // Add event listener to form submission
+    form.addEventListener('submit', function(event) {
+      event.preventDefault(); // Prevent form submission
+      
+      // Get the name, date of birth, barcode format, and custom text values
+      const name = document.getElementById('name').value;
+      const dob = document.getElementById('dob').value;
+      const format = document.getElementById('format').value;
+      const customText = document.getElementById('customText').value;
+      
+      // Generate the barcode text by concatenating the name, date of birth, and custom text
+      let barcodeText = name + ' ' + dob;
+      
+      // Append custom text if provided
+      if (customText.trim() !== '') {
+        barcodeText += ' ' + customText;
+      }
+      
+      // Clear the barcode container
+      barcodeContainer.innerHTML = '';
+      
+      if (format === 'QRCode') {
+        // Generate the QR code using QRCode.js library
+        const qrcode = new QRCode(barcodeContainer, {
+          text: barcodeText,
+          width: 128,
+          height: 128
+        });
+      } else {
+        // Create a new SVG element for CODE128 barcode
+        const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+        svg.classList.add("barcode-svg");
+        barcodeContainer.appendChild(svg);
+        
+        // Generate the CODE128 barcode using JsBarcode
+        JsBarcode(svg, barcodeText, {
+          format: "CODE128",
+          displayValue: true,
+          fontSize: 20,
+          margin: 10
+        });
+      }
+    });
+  </script>
+</body>
+</html>
